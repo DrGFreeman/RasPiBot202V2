@@ -1,0 +1,3 @@
+[submodule "AStar32U4"]
+	path = ../AStar32U4
+	url = https://github.com/pololu/a-star-32u4-arduino-library.git
