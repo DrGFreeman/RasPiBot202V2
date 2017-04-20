@@ -13,7 +13,7 @@ env:
 before_script:
   - wget https://github.com/pololu/a-star-32u4-arduino-library/archive/1.0.5.tar.gz -O /tmp/AStar32U4.tar.gz
   - tar -xvf /tmp/AStar32U4.tar.gz
-  - export PATH=$PATH:$PWD/AStar32U4
+  - export PATH=$PATH:$PWD/a-star-32u4-arduino-library-1.0.5
 
 script:
 - set -eo pipefail;
