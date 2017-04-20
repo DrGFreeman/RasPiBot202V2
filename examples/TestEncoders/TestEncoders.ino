@@ -1,5 +1,5 @@
 /*
-AStarEncoders.h
+TestEncoders.ino
 Source: https://github.com/DrGFreeman/RasPiBot202.V2
 
 MIT License
@@ -26,45 +26,39 @@ SOFTWARE.
 */
 
 /*
-An encoder class to read quadrature encoders on the
-Pololu AStar 32U4 microcontroller.
+Test encoders
 */
 
-#ifndef AStarEncoders_h
-#define AStarEncoders_h
-
-#include <Arduino.h>
 #include <AStar32U4.h>
-#include <FastGPIO.h>
+#include <AStarEncoders.h>
 
-class AStarEncoders
-{
-public:
-  // Constructor
-  AStarEncoders();
+AStarEncoders encoders;
+AStar32U4Motors motors;
+AStar32U4ButtonA btnA;
+AStar32U4ButtonB btnB;
 
-  // Flip count directions
-  void flipDirection(bool left, bool right);
+void setup() {
+  Serial.begin(9600);
+  encoders.flipDirection(false, true);
+}
 
-  // Get left counts
-  int getCountsLeft();
-
-  // Get right counts
-  int getCountsRight();
-
-  // Get left counts and reset left counts
-  int getCountsLeftAndReset();
-
-  // Get right counts and reset right counts
-  int getCountsRightAndReset();
-
-private:
-
-  // Flip left count direction
-  bool _flipLeft;
-
-  // Flip right count direction
-  bool _flipRight;
-};
-
-#endif
+void loop() {
+  int left = encoders.getCountsLeft();
+  int right = encoders.getCountsRight();
+  Serial.print(left);
+  Serial.print("\t");
+  Serial.println(right);
+  if (btnA.isPressed())
+  {
+    motors.setSpeeds(100, 100);
+  }
+  else if (btnB.isPressed())
+  {
+    motors.setSpeeds(-100, -100);
+  }
+  else
+  {
+    motors.setSpeeds(0, 0);
+  }
+  delay(25);
+}

@@ -97,8 +97,8 @@ AStarEncoders::AStarEncoders()
   PCIFR |= (1 << PCIF0);
 
   // Attach interrupts for right encoder
-  attachInterrupts(digitalPinToInterrupt(RIGHT_A), rightISR, CHANGE);
-  attachInterrupts(digitalPinToInterrupt(RIGHT_B), rightISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_A), rightISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_B), rightISR, CHANGE);
 
   // Initialize encoders variables
   lastLeftA = PINB & 0x10; // Use direct access to PINB register bit 4
@@ -107,14 +107,44 @@ AStarEncoders::AStarEncoders()
   lastRightB = PIND & 0x04; // Use direct access to PIND register bit 2
   leftCount = 0;
   rightCount = 0;
+
+  flipDirection(false, false);
+}
+
+// Flip count directions
+void AStarEncoders::flipDirection(bool left, bool right)
+{
+  if (left)
+  {
+    // Flip left encoder directions
+    _flipLeft = true;
+  }
+  else
+  {
+    _flipLeft = false;
+  }
+  if (right)
+  {
+    // Flip right encoder directions
+    _flipRight = true;
+  }
+  else
+  {
+    _flipRight = false;
+  }
 }
 
 // Get left counts
 int AStarEncoders::getCountsLeft()
 {
-  cli;
+  cli();
   int counts = leftCount;
-  sei;
+  sei();
+
+  if (_flipLeft)
+  {
+    counts *= -1;
+  }
 
   return counts;
 }
@@ -122,9 +152,14 @@ int AStarEncoders::getCountsLeft()
 // Get right counts
 int AStarEncoders::getCountsRight()
 {
-  cli;
+  cli();
   int counts = rightCount;
-  sei;
+  sei();
+
+  if (_flipRight)
+  {
+    counts *= -1;
+  }
 
   return counts;
 }
@@ -132,10 +167,15 @@ int AStarEncoders::getCountsRight()
 // Get left counts and reset left counts
 int AStarEncoders::getCountsLeftAndReset()
 {
-  cli;
+  cli();
   int counts = leftCount;
   leftCount = 0;
-  sei;
+  sei();
+
+  if (_flipLeft)
+  {
+    counts *= -1;
+  }
 
   return counts;
 }
@@ -143,10 +183,15 @@ int AStarEncoders::getCountsLeftAndReset()
 // Get right counts and reset right counts
 int AStarEncoders::getCountsRightAndReset()
 {
-  cli;
+  cli();
   int counts = rightCount;
   rightCount = 0;
-  sei;
+  sei();
+
+  if (_flipRight)
+  {
+    counts *= -1;
+  }
 
   return counts;
 }
