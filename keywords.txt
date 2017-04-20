@@ -1,0 +1,7 @@
+AStarEncoders	KEYWORD1
+
+flipDirection	KEYWORD2
+getCountsLeft	KEYWORD2
+getCountsRight	KEYWORD2
+getCountsLeftAndReset	KEYWORD2
+getCountsRightAndReset	KEYWORD2

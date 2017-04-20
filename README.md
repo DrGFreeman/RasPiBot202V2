@@ -1,7 +1,6 @@
 # RasPiBot202.V2
 A simple differential drive robot project based on Pololu Romi chassis and A-Star 32U4 SV w Raspberry Pi bridge
 
-[![Build Status](https://travis-ci.org/DrGFreeman/RasPiBot202.V2.svg?branch=master)](https://travis-ci.org/DrGFreeman/RasPiBot202.V2)  
 By Julien de la Bruère-Terreault (drgfreeman@tuta.io)
 
 ## Summary
