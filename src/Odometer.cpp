@@ -129,7 +129,7 @@ void Odometer::update(int countLeft, int countRight)
   // Calculate new Position
   _x += distCenter * cos(_phi);
   _y += distCenter * sin(_phi);
-  _phi = (_phi + deltaPhi);
+  _phi += deltaPhi;
 
   // Keep _phi within 0 & 2 * Pi
   if (_phi > 2 * M_PI)
