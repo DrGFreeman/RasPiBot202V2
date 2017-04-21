@@ -34,7 +34,7 @@ An odometer class for a differential drive robot
 
 #include <Arduino.h>
 
-class Odometer_h
+class Odometer
 {
 public:
   /* Constructor
@@ -45,32 +45,55 @@ public:
     encoderCounts * numerator / denominator).
     track: the width between the wheels in number of tickDist
   */
-  Odometer(unsigned int tickDistNum, unsigned int tickDistDenom,
-    unsigned int track);
+  Odometer(float tickDist, float track);
 
-  // Return the left speed in dist_unit / s
-  int getSpeedLeft();
+  // Return the angular velocity in rad/s
+  float getOmega();
 
-  // Return the right speed in dist_unit / s
-  int getSpeedRight();
+  // Return the phi angle
+  float getPhi();
 
-  // Return the time step between last two update calls
+  // Return the speed in distance unit / s
+  float getSpeed();
+
+  // Return the left speed in distance unit / s
+  float getSpeedLeft();
+
+  // Return the right speed in distance unit / s
+  float getSpeedRight();
+
+  // Return the time step between last two update calls in micro seconds
   unsigned int getTimeStep();
+
+  // Return the X position
+  float getX();
+
+  // Return the Y position
+  float getY();
 
   // Update odometer status
   void update(int countLeft, int countRight);
 
 private:
-  // Encoder counts attributes
+  // Position variables
+  float _x;
+  float _y;
+  float _phi;
+
+  // Speed variables
+  float _speedLeft;
+  float _speedRight;
+  float _omega;
+
+  // Encoder counts variables
   int _lastCountLeft;
-  int _lastCoundRight;
+  int _lastCountRight;
 
-  // Geomtrical attributes
-  unsigned int _tickDistNum;
-  unsigned int _tickDistDenom;
-  unsigned int _track;
+  // Geometrical attributes
+  float _tickDist;
+  float _track;
 
-  // Time step attributes
+  // Time step variables
   unsigned long _lastUpdateTime;
   unsigned int _timeStep;
 };
