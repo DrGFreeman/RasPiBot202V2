@@ -27,7 +27,7 @@ SOFTWARE.
 
 /*
 An encoder class to read quadrature encoders
-on the Pololu AStar microcontroller.
+on the Pololu AStar 32U4 microcontroller.
 */
 
 #include <AStarEncoders.h>
