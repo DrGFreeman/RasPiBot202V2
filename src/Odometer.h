@@ -38,11 +38,7 @@ class Odometer
 {
 public:
   /* Constructor
-    tickDistNum & tickDistDenom: the numerator and denominator of a fraction
-    defining the distance travelled for one encoder tick count. The numerator
-    should be small enough to avoid overflow of a signed integer representing
-    the distance travelled between two calls to the update method (distance =
-    encoderCounts * numerator / denominator).
+    tickDist: the distance travelled for one encoder tick count.
     track: the width between the wheels in number of tickDist
   */
   Odometer(float tickDist, float track);
