@@ -1,4 +1,4 @@
-# RasPiBot202.V2
+# RasPiBot202V2
 A simple differential drive robot project based on Pololu Romi chassis and A-Star 32U4 SV w Raspberry Pi bridge
 
 By Julien de la Bruère-Terreault (drgfreeman@tuta.io)
@@ -9,5 +9,7 @@ This library is a work in progress and is the second generation of my RasPiBot20
 This new library aims at improving the performance of the control system by transferring more of the low-level, timing sensitive duties such as odometry and motor PID controls from the Raspberry Pi to the A-Star 32U4 microcontroller.
 
 ## Dependencies
-The following libraries are used by this library:  
+The following libraries are required by this library:  
 * [pololu/a-star-32u4-arduino-library](https://github.com/pololu/a-star-32u4-arduino-library)
+* [pololu/pololu-rpi-slave-arduino-library](https://github.com/pololu/pololu-rpi-slave-arduino-library)
+* [DrGFreeman/TimedPID](https://github.com/drgfreeman/TimedPID)
