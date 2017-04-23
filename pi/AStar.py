@@ -26,8 +26,10 @@ class AStar:
     def move(self, fwd, turn):
         self.write_pack(6, 'hh', fwd, turn * 1000)
 
-    def odometer(self):
-        return self.read_unpack(10, 6, 'hhh')
+    def read_odometer(self):
+        x, y, phi = self.read_unpack(10, 6, 'hhh')
+        phi /= 1000
+        return x, y, phi
 
     def read_battery_millivolts(self):
         return self.read_unpack(16, 2, "H")[0]
