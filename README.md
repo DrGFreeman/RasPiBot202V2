@@ -3,7 +3,7 @@ A simple differential drive robot project based on Pololu Romi chassis and A-Sta
 
 By Julien de la Bruère-Terreault (drgfreeman@tuta.io)
 
-![Image of RPB-202 robot](https://github.com/DrGFreeman/RasPiBot202V2/blob/master/doc/img/rpb202-2.640px.jpg)
+![Image of RPB-202 robot](https://github.com/DrGFreeman/RasPiBot202V2/raw/master/doc/img/rpb202-2.640px.jpg)
 
 ## Summary
 This library is a work in progress and is the second generation of my RasPiBot202 robot. The first generation library, [DrGFreeman/RasPiBot202](https://github.com/DrGFreeman/RasPiBot202), remains available for reference but will not be developed further.
