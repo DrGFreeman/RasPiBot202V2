@@ -11,4 +11,5 @@ This new library aims at improving the performance of the control system by tran
 ## Dependencies
 The following libraries are required by this library:  
 * [pololu/a-star-32u4-arduino-library](https://github.com/pololu/a-star-32u4-arduino-library)
+* [pololu/pololu-rpi-slave-arduino-library](https://github.com/pololu/pololu-rpi-slave-arduino-library)
 * [DrGFreeman/TimedPID](https://github.com/drgfreeman/TimedPID)
