@@ -1,6 +1,6 @@
 /*
 Odometer.h
-Source: https://github.com/DrGFreeman/RasPiBot202.V2
+Source: https://github.com/DrGFreeman/RasPiBot202V2
 
 MIT License
 
@@ -66,6 +66,9 @@ public:
 
   // Return the Y position
   float getY();
+
+  // Reset the odometer
+  void reset();
 
   // Update odometer status
   void update(int countLeft, int countRight);

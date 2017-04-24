@@ -22,4 +22,5 @@ getSpeedRight	KEYWORD2
 getTimeStep	KEYWORD2
 getX	KEYWORD2
 getY	KEYWORD2
+reset	KEYWORD2
 update	KEYWORD2

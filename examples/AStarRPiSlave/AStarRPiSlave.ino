@@ -88,6 +88,8 @@ struct Data
   int16_t fwdSpeed, turnRate;
   int16_t x, y, phi;
 
+  bool resetOdometer;
+
   uint16_t batteryMillivolts;
 
   bool playNotes;
@@ -131,6 +133,12 @@ void loop() {
 
   // Write battery level into data structure
   slave.buffer.batteryMillivolts = readBatteryMillivoltsSV();
+
+  // Read reset odometer flag and reset odometer values if true
+  if (slave.buffer.resetOdometer)
+  {
+    odometer.reset();
+  }
 
   // Write odometry values into data structure
   slave.buffer.x = int(odometer.getX());
