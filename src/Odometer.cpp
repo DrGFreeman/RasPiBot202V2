@@ -1,6 +1,6 @@
 /*
 Odometer.cpp
-Source: https://github.com/DrGFreeman/RasPiBot202.V2
+Source: https://github.com/DrGFreeman/RasPiBot202V2
 
 MIT License
 
@@ -40,18 +40,9 @@ Odometer::Odometer(float tickDist, float track)
   _track = track;
 
   // Initialize variables
-  _x = 0;
-  _y = 0;
-  _phi = 0;
-
-  _speedLeft = 0;
-  _speedRight = 0;
-  _omega = 0;
-
   _lastCountLeft = 0;
   _lastCountRight = 0;
-
-  _lastUpdateTime = micros();
+  reset();
 }
 
 // Return the angular velocity in rad/s
@@ -102,6 +93,20 @@ float Odometer::getY()
   return _y;
 }
 
+// Reset the Odometer
+void Odometer::reset()
+{
+  _x = 0;
+  _y = 0;
+  _phi = 0;
+
+  _speedLeft = 0;
+  _speedRight = 0;
+  _omega = 0;
+
+  _lastUpdateTime = micros();
+}
+
 // Update position and speed with new encoder counts
 void Odometer::update(int countLeft, int countRight)
 {
@@ -132,7 +137,7 @@ void Odometer::update(int countLeft, int countRight)
   _phi += deltaPhi;
 
   // Keep _phi within 0 & 2 * Pi
-  if (_phi > 2 * M_PI)
+  if (_phi >= 2 * M_PI)
   {
     _phi -= 2 * M_PI;
   }

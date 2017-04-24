@@ -1,6 +1,6 @@
 /*
 TestOdometer.ino
-Source: https://github.com/DrGFreeman/RasPiBot202.V2
+Source: https://github.com/DrGFreeman/RasPiBot202V2
 
 MIT License
 
@@ -66,7 +66,7 @@ void loop() {
   Serial.print(odometer.getSpeed());
   Serial.print("\t");
   Serial.println(odometer.getOmega()*100);
-  
+
   if (btnA.isPressed())
   {
     // Turn left

@@ -1,6 +1,6 @@
 /*
 TestMotors.ino
-Source: https://github.com/DrGFreeman/RasPiBot202.V2
+Source: https://github.com/DrGFreeman/RasPiBot202V2
 
 MIT License
 
@@ -63,7 +63,7 @@ const int accelMax = 20;
 AStarEncoders encoders;
 Odometer odometer(tickDist, track);
 TimedPID PIDLeft(Kp, Ki, Kd);
-TimedPID PIDRight(Kp, Ki, Kd); 
+TimedPID PIDRight(Kp, Ki, Kd);
 
 // Define objects from AStar32U4 library
 AStar32U4Motors motors;
@@ -206,4 +206,3 @@ void setMotorSpeeds(int speedLeft, int speedRight)
   lastSpeedCmdLeft = speedCmdLeft;
   lastSpeedCmdRight = speedCmdRight;
 }
-
