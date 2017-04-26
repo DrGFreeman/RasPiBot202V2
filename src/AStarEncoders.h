@@ -35,7 +35,6 @@ Pololu AStar 32U4 microcontroller.
 
 #include <Arduino.h>
 #include <AStar32U4.h>
-#include <FastGPIO.h>
 
 class AStarEncoders
 {

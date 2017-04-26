@@ -81,10 +81,10 @@ static void rightISR()
 AStarEncoders::AStarEncoders()
 {
   // Set encoder pins mode
-  FastGPIO::Pin<LEFT_A>::setInputPulledUp();
-  FastGPIO::Pin<LEFT_B>::setInputPulledUp();
-  FastGPIO::Pin<RIGHT_A>::setInputPulledUp();
-  FastGPIO::Pin<RIGHT_B>::setInputPulledUp();
+  pinMode(LEFT_A, INPUT_PULLUP);
+  pinMode(LEFT_B, INPUT_PULLUP);
+  pinMode(RIGHT_A, INPUT_PULLUP);
+  pinMode(RIGHT_B, INPUT_PULLUP);
 
   // Enable PCINT4 & PCINT2; set 1 in PCMSK0 register bits 4 & 2
   PCMSK0 |= (1 << PCINT4);
