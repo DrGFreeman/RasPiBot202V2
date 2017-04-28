@@ -48,6 +48,9 @@ class AStar:
         self._y = 0
         self._phi =0
         self._batteryMV = 0
+        self._panServo = 0      # Servo is disabled by default
+        self._tiltServo = 0     # Servo is disabled by default
+        self._mastServo = 0     # Servo is disabled by default
         self._notes = ''
         self._resetOdometer = True
         self.run()
@@ -128,8 +131,13 @@ class AStar:
                 # LEDs
                 self._write_pack(0, 'BBB', self.ledYellow, self.ledGreen, \
                     self.ledRed)
+                # Servos
+                self._write_pack(19, 'HHH', self._panServo, self._tiltServo, \
+                    self._mastServo)
                 # Notes
-                self._write_pack(19, 'B15s', 1, self._notes.encode('ascii'))
+                if self._notes != "":
+                    self._write_pack(25, 'B15s', 1, self._notes.encode('ascii'))
+                    self._notes = ""
                 # Motors (turn rate in 1/1000 of radians / s)
                 turnRate = int(self._turnRate * 1000)
                 self._write_pack(6, 'hh', self._fwdSpeed, turnRate)
@@ -167,26 +175,38 @@ class AStar:
         """Returns the x and y position of the robot from the odometer in mm."""
         return self._x, self._y
 
-    def setYellowLED(self, value):
+    def setYellowLED(self, value = 0):
         """Sets the A-Star yellow led status (0 = Off, 1 = On)."""
         if value == 0:
             self.ledYellow = 0
         else:
             self.ledYellow = 1
 
-    def setGreenLED(self, value):
+    def setGreenLED(self, value = 0):
         """Sets the A-Star green led status (0 = Off, 1 = On)."""
         if value == 0:
             self.ledGreen = 0
         else:
             self.ledGreen = 1
 
-    def setRedLED(self, value):
+    def setRedLED(self, value = 0):
         """Sets the A-Star red led status (0 = Off, 1 = On)."""
         if value == 0:
             self.ledRed = 0
         else:
             self.ledRed = 1
+
+    def setPanServo(self, us_4 = 0):
+        """Sets the pan servo pulse width value in quarter-microseconds."""
+        self._panServo = us_4
+
+    def setTiltServo(self, us_4 = 0):
+        """Sets the tilt servo pulse width value in quarter-microseconds."""
+        self._tiltServo = us_4
+
+    def setMastServo(self, us_4 = 0):
+        """Sets the mast servo pulse width value in quarter-microseconds."""
+        self._mastServo = us_4
 
     def playNotes(self, notes):
         """Play the specified notes on the A-Star buzzer. Refer to the Pololu
@@ -197,7 +217,7 @@ class AStar:
         """Resets the odometer on the A-Star."""
         self._resetOdometer = True
 
-    def setSpeeds(self, fwdSpeed, turnRate):
+    def setSpeeds(self, fwdSpeed = 0, turnRate = 0):
         """Sets the robot speed in mm/s and turn rate in radians/s"""
         self._fwdSpeed = fwdSpeed
         self._turnRate = turnRate

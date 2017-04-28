@@ -27,6 +27,8 @@ SOFTWARE.
 
 /*
 AStar Raspberry Pi Slave
+This is the main sketch to run on the A-Star 32U4 Robot Controller for the 
+RPB202 robot.
 */
 
 #include <AStar32U4.h>
@@ -34,6 +36,7 @@ AStar Raspberry Pi Slave
 #include <AStarEncoders.h>
 #include <Odometer.h>
 #include <TimedPID.h>
+#include <PololuMaestro.h>
 
 // Define robot geometrical properties
 // Distance travelled per encoder tick
@@ -42,8 +45,8 @@ const float tickDist = .152505;
 const float track = 142.5;
 
 // Define motor PID gains
-const float Kp = 1.0; // 2.0
-const float Ki = 6.0; // 5.0
+const float Kp = 1.0;
+const float Ki = 6.0;
 const float Kd = 0.01;
 
 // Define motors max command
@@ -79,6 +82,15 @@ AStar32U4ButtonA btnA;
 AStar32U4ButtonB btnB;
 AStar32U4ButtonC btnC;
 
+// Define servo channels
+const byte panServoCh = 0;
+const byte tiltServoCh = 1;
+const byte mastServoCh = 2;
+
+// Define Pololu Mini Maestro object & serial port
+#define maestroSerial SERIAL_PORT_HARDWARE_OPEN
+MicroMaestro maestro(maestroSerial);
+
 // Data exchanged with the Raspberry Pi
 struct Data
 {
@@ -92,6 +104,8 @@ struct Data
 
   uint16_t batteryMillivolts;
 
+  uint16_t panServo, tiltServo, mastServo;
+
   bool playNotes;
   char notes[14];
 };
@@ -100,11 +114,14 @@ struct Data
 PololuRPiSlave<struct Data,5> slave;
 
 void setup() {
-  //Serial.begin(9600);
-  //while(!Serial);
-
+//  Serial.begin(9600);
+//  while(!Serial);
+  
   // Set up the slave at I2C address 20
   slave.init(20);
+
+  // Start serial communication with the Mini Maestro
+  maestroSerial.begin(9600);
 
   // Play startup sound
   buzzer.play("V10>>g16>>>c16");
@@ -149,6 +166,11 @@ void loop() {
   ledYellow(slave.buffer.yellow);
   ledGreen(slave.buffer.green);
   ledRed(slave.buffer.red);
+
+  // Read servo positions from buffer and write to servo objects
+  maestro.setTarget(panServoCh, slave.buffer.panServo);
+  maestro.setTarget(tiltServoCh, slave.buffer.tiltServo);
+  maestro.setTarget(mastServoCh, slave.buffer.mastServo);
 
   // Read speed and turn rate from buffer and calculate motor speeds
   float fwdSpeed = float(slave.buffer.fwdSpeed);
