@@ -54,6 +54,8 @@ class AStar:
         self._notes = ''
         self._resetOdometer = True
         self.run()
+        # Wait to ensure we can read/write the buffer once before starting
+        time.sleep(.05)
 
     def _read_unpack(self, address, size, format):
         """Reads data from the I2C bus."""
