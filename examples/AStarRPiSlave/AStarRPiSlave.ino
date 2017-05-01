@@ -53,7 +53,7 @@ const float Kd = 0.01;
 const float motorsMaxCommand = 400;
 
 // Define motor trims in 1/40
-const int leftTrim = 30;
+const int leftTrim = 40;
 const int rightTrim = 40;
 
 // Define speed variables for acceleration control
@@ -61,7 +61,7 @@ int lastSpeedCmdLeft = 0;
 int lastSpeedCmdRight = 0;
 
 // Define maximum speed command change per time step
-const int accelMax = 20;
+const int accelMax = 10;
 
 // Define different objects from RasPiBot202V2 library
 // Encoders
@@ -133,6 +133,19 @@ void setup() {
   // Set PID controllers command range
   pidLeft.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
   pidRight.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
+
+  if (btnA.isPresses())
+  {
+    // Center servos
+    maestro.setTarget(panServoCh, 6000);
+    maestro.setTarget(tiltServoCh, 6000);
+    maestro.setTarget(mastServoCh, 6000);
+    delay(500);
+    // Release servos
+    maestro.setTarget(panServoCh, 0);
+    maestro.setTarget(tiltServoCh, 0);
+    maestro.setTarget(mastServoCh, 0);
+  }
 }
 
 void loop() {
