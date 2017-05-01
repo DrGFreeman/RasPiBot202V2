@@ -46,7 +46,7 @@ class AStar:
         self._turnRate = 0
         self._x = 0
         self._y = 0
-        self._phi =0
+        self._phi = 0
         self._batteryMV = 0
         self._panServo = 0      # Servo is disabled by default
         self._tiltServo = 0     # Servo is disabled by default
@@ -115,7 +115,7 @@ class AStar:
                 # Odometer
                 self._x, self._y, phi = self._read_unpack(10, 6, 'hhh')
                 # Convert phi reading from 1/1000 of radians to radians
-                self._phi = phi / 1000
+                self._phi = phi / 1000.
                 # Battery level
                 self._batteryMV = self._read_unpack(17, 2, 'H')[0]
 
