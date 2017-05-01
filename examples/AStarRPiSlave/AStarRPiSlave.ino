@@ -27,7 +27,7 @@ SOFTWARE.
 
 /*
 AStar Raspberry Pi Slave
-This is the main sketch to run on the A-Star 32U4 Robot Controller for the 
+This is the main sketch to run on the A-Star 32U4 Robot Controller for the
 RPB202 robot.
 */
 
@@ -104,10 +104,10 @@ struct Data
 
   uint16_t batteryMillivolts;
 
-  uint16_t panServo, tiltServo, mastServo;
-
   bool playNotes;
   char notes[14];
+
+  uint16_t panServo, tiltServo, mastServo;
 };
 
 // Define Pololu RPi Slave objects
@@ -116,7 +116,7 @@ PololuRPiSlave<struct Data,5> slave;
 void setup() {
 //  Serial.begin(9600);
 //  while(!Serial);
-  
+
   // Set up the slave at I2C address 20
   slave.init(20);
 
@@ -138,6 +138,13 @@ void setup() {
 void loop() {
   // Get current time
   unsigned long currentTime = micros();
+
+  // Read odometer counts
+  int countsLeft = encoders.getCountsLeft();
+  int countsRight = encoders.getCountsRight();
+
+  // Update odometer
+  odometer.update(countsLeft, countsRight);
 
   /* Call updateBuffer() before using the buffer, to get the latest
   data including recent master writes. */
@@ -210,13 +217,6 @@ void loop() {
 // Sets the motor speeds using PID controllers
 void setMotorSpeeds(int speedLeft, int speedRight)
 {
-  // Read odometer counts
-  int countsLeft = encoders.getCountsLeft();
-  int countsRight = encoders.getCountsRight();
-
-  // Update odometer
-  odometer.update(countsLeft, countsRight);
-
   // get speed command from PID controllers
   int speedCmdLeft = pidLeft.getCmdAutoStep(speedLeft, odometer.getSpeedLeft());
   int speedCmdRight = pidRight.getCmdAutoStep(speedRight, odometer.getSpeedRight());

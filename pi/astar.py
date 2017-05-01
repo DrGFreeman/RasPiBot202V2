@@ -132,11 +132,11 @@ class AStar:
                 self._write_pack(0, 'BBB', self.ledYellow, self.ledGreen, \
                     self.ledRed)
                 # Servos
-                self._write_pack(19, 'HHH', self._panServo, self._tiltServo, \
+                self._write_pack(34, 'HHH', self._panServo, self._tiltServo, \
                     self._mastServo)
                 # Notes
                 if self._notes != "":
-                    self._write_pack(25, 'B15s', 1, self._notes.encode('ascii'))
+                    self._write_pack(19, 'B15s', 1, self._notes.encode('ascii'))
                     self._notes = ""
                 # Motors (turn rate in 1/1000 of radians / s)
                 turnRate = int(self._turnRate * 1000)
