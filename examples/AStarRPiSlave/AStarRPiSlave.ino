@@ -134,7 +134,7 @@ void setup() {
   pidLeft.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
   pidRight.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
 
-  if (btnA.isPresses())
+  if (btnA.isPressed())
   {
     // Center servos
     maestro.setTarget(panServoCh, 6000);
