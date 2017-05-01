@@ -34,8 +34,8 @@ on the Pololu AStar 32U4 microcontroller.
 
 // Encoder pins
 // !!! Update ISRs and constructor below if changing these pins !!!
-// Left A: PCINT4, PB4, digital pin 8, PINB & 0B00010000 (0x10)
-const byte LEFT_A = 8;
+// Left A: PCINT1, PB1, digital pin 15, PINB & 0B00000010 (0x02)
+const byte LEFT_A = 15;
 // Left B: PCINT2, PB2, digital pin 16, PINB & 0B00000100 (0x04)
 const byte LEFT_B = 16;
 // Right A: INT6, PE6, digital pin 7, PINE & 0B01000000 (0x40)
@@ -53,10 +53,10 @@ volatile uint16_t leftCount;
 volatile uint16_t rightCount;
 
 // ISRs
-// ISR for left encoder pins A & B (PCINT4, PCINT2)
+// ISR for left encoder pins A & B (PCINT1, PCINT2)
 ISR(PCINT0_vect)
 {
-  bool newLeftA = PINB & 0x10; // Use direct access to PINB register bit 4
+  bool newLeftA = PINB & 0x02; // Use direct access to PINB register bit 1
   bool newLeftB = PINB & 0x04; // Use direct access to PINB register bit 2
 
   leftCount += (newLeftA ^ lastLeftB) - (lastLeftA ^ newLeftB);
@@ -86,8 +86,8 @@ AStarEncoders::AStarEncoders()
   pinMode(RIGHT_A, INPUT_PULLUP);
   pinMode(RIGHT_B, INPUT_PULLUP);
 
-  // Enable PCINT4 & PCINT2; set 1 in PCMSK0 register bits 4 & 2
-  PCMSK0 |= (1 << PCINT4);
+  // Enable PCINT1 & PCINT2; set 1 in PCMSK0 register bits 1 & 2
+  PCMSK0 |= (1 << PCINT1);
   PCMSK0 |= (1 << PCINT2);
 
   // Enable pin change interrupts; set 1 in PCICR register bit 1 (PCIE0)
@@ -101,7 +101,7 @@ AStarEncoders::AStarEncoders()
   attachInterrupt(digitalPinToInterrupt(RIGHT_B), rightISR, CHANGE);
 
   // Initialize encoders variables
-  lastLeftA = PINB & 0x10; // Use direct access to PINB register bit 4
+  lastLeftA = PINB & 0x02; // Use direct access to PINB register bit 4
   lastLeftB = PINB & 0x04; // Use direct access to PINB register bit 2
   lastRightA = PINE & 0x40; // Use direct access to PINE register bit 6
   lastRightB = PIND & 0x04; // Use direct access to PIND register bit 2

@@ -46,7 +46,7 @@ class AStar:
         self._turnRate = 0
         self._x = 0
         self._y = 0
-        self._phi =0
+        self._phi = 0
         self._batteryMV = 0
         self._panServo = 0      # Servo is disabled by default
         self._tiltServo = 0     # Servo is disabled by default
@@ -54,6 +54,8 @@ class AStar:
         self._notes = ''
         self._resetOdometer = True
         self.run()
+        # Wait to ensure we can read/write the buffer once before starting
+        time.sleep(.05)
 
     def _read_unpack(self, address, size, format):
         """Reads data from the I2C bus."""
@@ -115,7 +117,7 @@ class AStar:
                 # Odometer
                 self._x, self._y, phi = self._read_unpack(10, 6, 'hhh')
                 # Convert phi reading from 1/1000 of radians to radians
-                self._phi = phi / 1000
+                self._phi = phi / 1000.
                 # Battery level
                 self._batteryMV = self._read_unpack(17, 2, 'H')[0]
 
@@ -132,11 +134,11 @@ class AStar:
                 self._write_pack(0, 'BBB', self.ledYellow, self.ledGreen, \
                     self.ledRed)
                 # Servos
-                self._write_pack(19, 'HHH', self._panServo, self._tiltServo, \
+                self._write_pack(34, 'HHH', self._panServo, self._tiltServo, \
                     self._mastServo)
                 # Notes
                 if self._notes != "":
-                    self._write_pack(25, 'B15s', 1, self._notes.encode('ascii'))
+                    self._write_pack(19, 'B15s', 1, self._notes.encode('ascii'))
                     self._notes = ""
                 # Motors (turn rate in 1/1000 of radians / s)
                 turnRate = int(self._turnRate * 1000)

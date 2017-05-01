@@ -27,7 +27,7 @@ SOFTWARE.
 
 /*
 AStar Raspberry Pi Slave
-This is the main sketch to run on the A-Star 32U4 Robot Controller for the 
+This is the main sketch to run on the A-Star 32U4 Robot Controller for the
 RPB202 robot.
 */
 
@@ -53,7 +53,7 @@ const float Kd = 0.01;
 const float motorsMaxCommand = 400;
 
 // Define motor trims in 1/40
-const int leftTrim = 30;
+const int leftTrim = 40;
 const int rightTrim = 40;
 
 // Define speed variables for acceleration control
@@ -61,7 +61,7 @@ int lastSpeedCmdLeft = 0;
 int lastSpeedCmdRight = 0;
 
 // Define maximum speed command change per time step
-const int accelMax = 20;
+const int accelMax = 10;
 
 // Define different objects from RasPiBot202V2 library
 // Encoders
@@ -104,10 +104,10 @@ struct Data
 
   uint16_t batteryMillivolts;
 
-  uint16_t panServo, tiltServo, mastServo;
-
   bool playNotes;
   char notes[14];
+
+  uint16_t panServo, tiltServo, mastServo;
 };
 
 // Define Pololu RPi Slave objects
@@ -116,7 +116,7 @@ PololuRPiSlave<struct Data,5> slave;
 void setup() {
 //  Serial.begin(9600);
 //  while(!Serial);
-  
+
   // Set up the slave at I2C address 20
   slave.init(20);
 
@@ -133,11 +133,31 @@ void setup() {
   // Set PID controllers command range
   pidLeft.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
   pidRight.setCmdRange(-motorsMaxCommand, motorsMaxCommand);
+
+  if (btnA.isPresses())
+  {
+    // Center servos
+    maestro.setTarget(panServoCh, 6000);
+    maestro.setTarget(tiltServoCh, 6000);
+    maestro.setTarget(mastServoCh, 6000);
+    delay(500);
+    // Release servos
+    maestro.setTarget(panServoCh, 0);
+    maestro.setTarget(tiltServoCh, 0);
+    maestro.setTarget(mastServoCh, 0);
+  }
 }
 
 void loop() {
   // Get current time
   unsigned long currentTime = micros();
+
+  // Read odometer counts
+  int countsLeft = encoders.getCountsLeft();
+  int countsRight = encoders.getCountsRight();
+
+  // Update odometer
+  odometer.update(countsLeft, countsRight);
 
   /* Call updateBuffer() before using the buffer, to get the latest
   data including recent master writes. */
@@ -210,13 +230,6 @@ void loop() {
 // Sets the motor speeds using PID controllers
 void setMotorSpeeds(int speedLeft, int speedRight)
 {
-  // Read odometer counts
-  int countsLeft = encoders.getCountsLeft();
-  int countsRight = encoders.getCountsRight();
-
-  // Update odometer
-  odometer.update(countsLeft, countsRight);
-
   // get speed command from PID controllers
   int speedCmdLeft = pidLeft.getCmdAutoStep(speedLeft, odometer.getSpeedLeft());
   int speedCmdRight = pidRight.getCmdAutoStep(speedRight, odometer.getSpeedRight());
