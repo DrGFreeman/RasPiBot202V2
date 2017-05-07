@@ -152,7 +152,7 @@ void loop() {
   // Get current time
   unsigned long currentTime = micros();
 
-  // Read odometer counts
+  // Read encoder counts
   int countsLeft = encoders.getCountsLeft();
   int countsRight = encoders.getCountsRight();
 
