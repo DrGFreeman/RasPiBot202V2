@@ -1,4 +1,4 @@
-# astar.py
+# astarRPB202.py
 # Source: https://github.com/DrGFreeman/RasPiBot202V2
 #
 # MIT License
@@ -44,13 +44,17 @@ class AStar:
         self._buttonC = 0
         self._fwdSpeed = 0
         self._turnRate = 0
+        self._lockSpeeds = False
         self._x = 0
         self._y = 0
         self._phi = 0
+        self._lockOdometer = False
         self._batteryMV = 0
+        self._lockBattery = False
         self._panServo = 0      # Servo is disabled by default
         self._tiltServo = 0     # Servo is disabled by default
         self._mastServo = 0     # Servo is disabled by default
+        self._lockServos = False
         self._notes = ''
         self._resetOdometer = True
         self.run()
@@ -114,12 +118,18 @@ class AStar:
                 # Buttons
                 self._buttonA, self._buttonB, self._buttonC = \
                     self._read_unpack(3, 3, '???')
+
                 # Odometer
+                self._lockOdometer = True
                 self._x, self._y, phi = self._read_unpack(10, 6, 'hhh')
                 # Convert phi reading from 1/1000 of radians to radians
                 self._phi = phi / 1000.
+                self._lockOdometer = False
+
                 # Battery level
+                self._lockBattery = True
                 self._batteryMV = self._read_unpack(17, 2, 'H')[0]
+                self._lockBattery = False
 
                 # Write to buffer
 
@@ -130,19 +140,27 @@ class AStar:
                     time.sleep(.02)
                 else:
                     self._write_pack(16, 'B', 0)
+
                 # LEDs
                 self._write_pack(0, 'BBB', self.ledYellow, self.ledGreen, \
                     self.ledRed)
+
                 # Servos
+                self._lockServos = True
                 self._write_pack(34, 'HHH', self._panServo, self._tiltServo, \
                     self._mastServo)
+                self._lockServos = False
+
                 # Notes
                 if self._notes != "":
                     self._write_pack(19, 'B15s', 1, self._notes.encode('ascii'))
                     self._notes = ""
+
                 # Motors (turn rate in 1/1000 of radians / s)
+                self._lockSpeeds = True
                 turnRate = int(self._turnRate * 1000)
                 self._write_pack(6, 'hh', self._fwdSpeed, turnRate)
+                self._lockSpeeds = False
 
             except IOError:
                 # Handle I2C communication error
@@ -163,6 +181,9 @@ class AStar:
 
     def getBatteryVolts(self):
         """Returns the robot battery level in Volts."""
+        while self._lockBattery:
+            # Wait while battery attribute is locked
+            pass
         return self._batteryMV / 1000.
 
     def getOdometerPhi(self):
@@ -171,10 +192,16 @@ class AStar:
         direction. The angle increases turning in direction of the positive y
         axis (left turn).
         """
+        while self._lockOdometer:
+            # Wait while odometer attributes are locked
+            pass
         return self._phi
 
     def getOdometerXY(self):
         """Returns the x and y position of the robot from the odometer in mm."""
+        while self._lockOdometer:
+            # Wait while odometer attributes are locked
+            pass
         return self._x, self._y
 
     def setYellowLED(self, value = 0):
@@ -200,14 +227,23 @@ class AStar:
 
     def setPanServo(self, us_4 = 0):
         """Sets the pan servo pulse width value in quarter-microseconds."""
+        while self._lockServos:
+            # Wait while servos attributes are locked
+            pass
         self._panServo = us_4
 
     def setTiltServo(self, us_4 = 0):
         """Sets the tilt servo pulse width value in quarter-microseconds."""
+        while self._lockServos:
+            # Wait while servos attributes are locked
+            pass
         self._tiltServo = us_4
 
     def setMastServo(self, us_4 = 0):
         """Sets the mast servo pulse width value in quarter-microseconds."""
+        while self._lockServos:
+            # Wait while servos attributes are locked
+            pass
         self._mastServo = us_4
 
     def playNotes(self, notes):
@@ -221,5 +257,8 @@ class AStar:
 
     def setSpeeds(self, fwdSpeed = 0, turnRate = 0):
         """Sets the robot speed in mm/s and turn rate in radians/s"""
+        while self._lockSpeeds:
+            # Wait while speds attributes are locked
+            pass
         self._fwdSpeed = fwdSpeed
         self._turnRate = turnRate
