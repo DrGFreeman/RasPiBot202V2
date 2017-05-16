@@ -1,4 +1,4 @@
-# astarRPB202.py
+# astar.py
 # Source: https://github.com/DrGFreeman/RasPiBot202V2
 #
 # MIT License
