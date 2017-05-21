@@ -29,10 +29,12 @@
 
 import time
 from math import pi
+from timedpid import TimedPID
 
 # Constants definition
 
 ACCEL_FIXED, ACCEL_NONE = range(2)
+MODE_FORWARD, MODE_STOP, MODE_TURN = range(3)
 
 # MotionController class definition
 
@@ -50,17 +52,23 @@ class MotionController:
         # Initialize current forward speed to 0
         self._fwdSpeedCurrent = 0.
         # Set default turn acceleration to pi rad/s^2
-        self._turnAccel = pi
+        self._turnAccel = 1. * pi
         # Set turn acceleration mode to ACCEL_FIXED
         self._turnAccelMode = ACCEL_FIXED
         # Set default maximum turn rate to 2 * pi rad/s
-        self._turnRateMax = 2 * pi
+        self._turnRateMax = 2. * pi
         # Initialize current turn rate to 0
         self._turnRateCurrent = 0.
         # Initialize _lastUpdateTime to current time
         self._lastUpdateTime = time.time()
         # Initialize _timeStep to .01 s
         self._timeStep = .01
+        # Initialize turn PID mode
+        self._turnPIDMode = MODE_STOP
+        # Initialize turn PID object
+        self._turnPID = TimedPID()
+
+    # Settings and status methods
 
     def getFwdSpeed(self):
         """Returns the current forward speed in mm/s."""
@@ -83,6 +91,11 @@ class MotionController:
         """Sets the forward acceleration mode"""
         self._fwdAccelMode = accelMode
 
+    def setMaxSpeeds(self, fwdSpeedMax, turnRateMax):
+        """Sets the maximum forward speed and turn rate in mm/s and rad/s."""
+        self._fwdSpeedMax = fwdSpeedMax
+        self._turnRateMax = turnRateMax
+
     def setTurnAccel(self, turnAccel):
         """Sets the fixed turn acceleration in rad/s^2 to use with accel mode
         ACCEL_FIXED."""
@@ -91,6 +104,86 @@ class MotionController:
     def setTurnAccelMode(self, accelMode):
         """Sets the turn acceleration mode"""
         self._turnAccelMode = accelMode
+
+    # Motion control methods
+
+    def forwardAngle(self, angle, fwdSpeed):
+        """Moves forward at the specified angle. A PID controller is used to
+        control the turn rate to maintain the target angle. This method must be
+        called inside a loop at short intervals."""
+        # Set turn PID mode
+        self._setTurnPIDMode(MODE_FORWARD)
+        # Calculate relative angle to desired angle
+        currentAngle = self._aStar.getOdometerPhi()
+        relativeAngle = self._relativeAngle(currentAngle, angle)
+        # Get turn rate command from PID
+        turnRate = -self._turnPID.getCmdAutoStep(0, relativeAngle)
+        # Set robot speeds
+        self.setSpeeds(fwdSpeed, turnRate)
+
+    def turnAngle(self, angle, turnRateTarget = pi, precise = False):
+        """Turns a specified angle relative to the current angle.
+        This method executes until the target angle is reached.
+        See turnToAngle method for arguments details."""
+        # Calculate target angle
+        currentAngle = self._aStar.getOdometerPhi()
+        targetAngle = (currentAngle + angle) % (2 * pi)
+        # Call turnToAngle with calculated target angle
+        self.turnToAngle(targetAngle, turnRateTarget, precise)
+
+    def turnToAngle(self, angle, turnRateTarget = pi, precise = False):
+        """Turns to a specified angle (absolute).
+        angle is the target angle,
+        turnRateTarget is the maximum turn rate,
+        precise is used to get more accurate final angle (slower).
+        This method executes until the target angle is reached."""
+        # Store current turn accel mode so we can restore it at the end
+        turnAccelMode = self._turnAccelMode
+        # Define turn settings
+        if precise:
+            # Define max turn rate
+            if turnRateTarget > pi / 2.:
+                turnRateTarget = pi / 2.
+            # Define minimum turn rate
+            turnRateMin = pi / 10.
+            # Define angle at which to slow down
+            angleLow = turnRateTarget * .25
+            # Define stop angle tolerance
+            angleTol = pi / 360.
+        else:
+            # Define max turn rate
+            if turnRateTarget > pi:
+                turnRateTarget = pi
+            # Define minimum turn rate
+            turnRateMin = pi / 5.
+            # Define angle at which to slow down
+            angleLow = turnRateTarget * .2
+            # Define stop angle tolerance
+            angleTol = pi / 60.
+        # Set turn PID mode
+        self._setTurnPIDMode(MODE_TURN)
+        # Turn until desired angle is reached (relative angle < tolerance)
+        relativeAngle = pi # Dummy value to enter while loop
+        while abs(relativeAngle) > angleTol:
+            # Calculate relative angle to desired angle
+            currentAngle = self._aStar.getOdometerPhi()
+            relativeAngle = self._relativeAngle(currentAngle, angle)
+            turnDir = relativeAngle / abs(relativeAngle)
+            # Ajust speed as function of relative angle
+            if abs(relativeAngle) < angleLow:
+                # Set turn accel mode to NONE
+                self.setTurnAccelMode(ACCEL_NONE)
+                # Set minimum turn rate
+                turnRate = turnDir * turnRateMin
+            else:
+                turnRate = turnDir * turnRateTarget
+            # Set robot speeds
+            self.setSpeeds(0, turnRate)
+            time.sleep(.01)
+        # Stop
+        self.stop()
+        # Restore turn accel mode to what it was when the method was called
+        self.setTurnAccelMode(turnAccelMode)
 
     def setSpeeds(self, fwdSpeed, turnRate):
         """Sets the robot speed in mm/s and turn rate in radians/s."""
@@ -103,6 +196,8 @@ class MotionController:
 
     def stop(self):
         """Stops the robot immediately."""
+        # Set turn PID mode to STOP
+        self._setTurnPIDMode(MODE_STOP)
         # Set AStar speeds to 0
         self._aStar.setSpeeds()
 
@@ -169,6 +264,34 @@ class MotionController:
         # Update current turn rate
         self._turnRateCurrent = newTurnRate
         return newTurnRate
+
+    def _relativeAngle(self, angleFrom, angleTo):
+        """Returns the shortest relative angle from an angle "angleFrom" to
+        another angle "angleTo". The returned angle is bound between -pi and pi.
+        """
+        # Bound angles between 0 and 2*pi
+        angleFrom = angleFrom % (2 * pi)
+        angleTo = angleTo % (2 * pi)
+        # Calculate relative angle and bound within -pi and -pi
+        relativeAngle = angleTo - angleFrom
+        if relativeAngle > pi:
+            # Relative angle is greater than pi, substract 2*pi
+            relativeAngle -= 2 * pi
+        elif relativeAngle < -pi:
+            # Relative angle is smaller than pi, add 2*pi
+            relativeAngle += 2 * pi
+        return relativeAngle
+
+    def _setTurnPIDMode(self, mode):
+        """Sets the turn PID mode and resets the PID errors when mode changes.
+        """
+        if mode != self._turnPIDMode:
+            # Mode has changed
+            self._turnPIDMode = mode
+            self._turnPID.reset()
+            # Set PID gains for specified mode
+            if mode == MODE_FORWARD:
+                self._turnPID.setGains(1.5)
 
     def _updateTimeStep(self):
         """Update time step."""
