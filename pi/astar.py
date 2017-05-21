@@ -60,6 +60,9 @@ class AStar:
         self.run()
         # Wait to ensure we can read/write the buffer once before starting
         time.sleep(.05)
+        # Print battery level
+        print("RPB202")
+        print("Battery level: " + str(round(self.getBatteryVolts(), 2)) + "V")
 
     def _read_unpack(self, address, size, format):
         """Reads data from the I2C bus."""
