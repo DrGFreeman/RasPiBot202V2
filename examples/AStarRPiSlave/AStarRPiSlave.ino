@@ -45,9 +45,9 @@ const float tickDist = .152505;
 const float track = 142.5;
 
 // Define motor PID gains
-const float Kp = 1.0;
-const float Ki = 6.0;
-const float Kd = 0.01;
+const float Kp = 0.4;
+const float Ki = 1.9;
+const float Kd = 0.0;
 
 // Define motors max command
 const float motorsMaxCommand = 400;
@@ -114,9 +114,6 @@ struct Data
 PololuRPiSlave<struct Data,5> slave;
 
 void setup() {
-//  Serial.begin(9600);
-//  while(!Serial);
-
   // Set up the slave at I2C address 20
   slave.init(20);
 
@@ -152,7 +149,7 @@ void loop() {
   // Get current time
   unsigned long currentTime = micros();
 
-  // Read odometer counts
+  // Read encoder counts
   int countsLeft = encoders.getCountsLeft();
   int countsRight = encoders.getCountsRight();
 
@@ -219,7 +216,6 @@ void loop() {
   // We are done writing; make modified data available to I2C master
   slave.finalizeWrites();
 
-  //Serial.println(micros() - currentTime);
   // Ensure a constant time step of the main loop (10 milliseconds)
   while (micros() - currentTime < 10000)
   {
