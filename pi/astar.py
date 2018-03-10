@@ -162,7 +162,8 @@ class AStar:
                 # Motors (turn rate in 1/1000 of radians / s)
                 self._lockSpeeds = True
                 turnRate = int(self._turnRate * 1000)
-                self._write_pack(6, 'hh', self._fwdSpeed, turnRate)
+                fwdSpeed = int(self._fwdSpeed)
+                self._write_pack(6, 'hh', fwdSpeed, turnRate)
                 self._lockSpeeds = False
 
             except IOError:
